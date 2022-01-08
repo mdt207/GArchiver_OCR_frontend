@@ -1,2 +1,2 @@
 /usr/bin/ruby
-/media/share/gnu2/ruby/subtitle_extractor/conert_to_text.rb
+/media/share/gnu2/ruby/text_extractor/conert_to_text.rb

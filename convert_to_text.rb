@@ -1,5 +1,10 @@
 #!/usr/bin/ruby
 
+# Bismillahir Rahmanir Raheem
+# All praises and gratitudes are due to Allah subhanahu wa Ta'ala
+# O Allah: (please do) bless Muhammad (s.a.w) and the Household of Muhammad (s.a.w)
+
+
 require 'pathname'
 require 'open3'
 require 'vips'

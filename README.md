@@ -4,7 +4,7 @@ This is a front-end for tesseract-ocr for obtaining data and entering it to the 
 An application depends on from the following components: GTK+-3, Cairo - 2D graphics library, libvips - image processing system, Ruby (programming language), Tesseract - an optical character recognition engine.
 
 Using GArchiver_OCR_frontend on Windows 10.
-Needed applications versions that are used for deploymwnt:
+Needed applications versions that are used for deployment:
  1. rubyinstaller-devkit-3.0.3-1-x64.exe
  2. tesseract-ocr-w64-setup-v5.0.0.20211201.exe
  3. vips-dev-w64-all-8.12.1.zip

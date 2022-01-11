@@ -1,8 +1,3 @@
-// Bismillahir Rahmanir Raheem
-// All praises and gratitudes are due to Allah subhanahu wa Ta'ala
-// O Allah: (please do) bless Muhammad (s.a.w) and the Household of Muhammad (s.a.w)
-
-
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
 #include <gdk/gdkkeysyms-compat.h>
@@ -74,7 +69,7 @@ GtkWidget *darea;
 GtkWidget *text_view;
 GtkWidget *scrolled_window, *scrolled_window2;
 GtkWidget *aboutus_btn, *show_ocr_btn;
-GtkWidget *settings_btn;
+GtkWidget *settings_btn, *flush_btn;
 
 
 VipsImage *vimg = nullptr;
@@ -225,17 +220,20 @@ static bool globalInit()
 						enable_all_controlls = FALSE;
 						throw(std::filesystem::filesystem_error("ruby.exe application does not exist!", err_code) );
 					}
+					
 					pCmd[2] = "list_roi.txt";
-					path_prefix += PathGetDirSeperator(pCmd[1]);
+					/*path_prefix += PathGetDirSeperator(pCmd[1]);
 					path_prefix += pCmd[2]; /* /list_roi.txt (/) - path delimiter */
 					
-					std::string dest = PathGetDir (pCmd[1]); //destination path
-					//dest += PathGetDirSeperator(pCmd[1]);
+					//std::string dest = PathGetDir (pCmd[1]); //destination path
+					///dest += PathGetDirSeperator(pCmd[1]);
 					
-					cout << dest << " " << path_prefix << endl;
-					//if ( is_file_exist( pCmd[2] ) )
-					if ( is_file_exist( path_prefix ) )
+					//cout << dest << " " << path_prefix << endl;
+					///if ( is_file_exist( pCmd[2] ) )
+					/*if ( is_file_exist( path_prefix ) )
+					{
 						copy_file_to_dest(path_prefix, dest);
+					}
 					else
 					{
 						std::error_code err_code;
@@ -245,16 +243,16 @@ static bool globalInit()
 						str += "\nTo make that file first select region from image\
 						\nand push F9 button for conversion.";						
 						
-						enable_all_controlls = FALSE;
+						//enable_all_controlls = FALSE;
 						throw(std::filesystem::filesystem_error(str, err_code) );
-					}
+					}*/
 					
-					dest = PathGetDir (pCmd[1]);
+					/*dest = PathGetDir (pCmd[1]);
 					dest += PathGetDirSeperator(pCmd[1]);
 					dest += "ocr_file.txt";
 				
 					if ( is_file_exist( dest ) )
-						glob.is_converted = true;
+						glob.is_converted = true;*/
 				}
 				catch (std::filesystem::filesystem_error const& ex)
 				{
@@ -940,7 +938,20 @@ kbd_press_event ( GtkWidget *widget, GdkEventKey *event, gpointer data)
 			
 		   case GDK_KEY_a:
            {
-			 //std::cout << "ctrl gotcha\n"; 
+			 //std::cout << "ctrl gotcha\n";
+			 /*if (isROIcoordsCollecting)
+			 {
+				std::string dest( PathGetDir (pCmd[1]) );
+				//dest = PathGetDir (pCmd[1]);
+				dest += PathGetDirSeperator(pCmd[1]);
+				dest += "ocr_file.txt";
+				
+				if ( is_file_exist( dest ) )
+				{	
+					std::cout << "deleting:" << dest << std::endl;
+					g_remove (&dest[0]);
+				}
+			 }*/
 			 isROIcoordsCollecting ? array_roi_coords.clear(), isROIcoordsCollecting = false : isROIcoordsCollecting = true;
 			 //if (!isROIcoordsCollecting)
 			 //   array_roi_coords.clear();
@@ -965,8 +976,8 @@ kbd_press_event ( GtkWidget *widget, GdkEventKey *event, gpointer data)
            {
 			   if (glob.is_converted || glob.is_text_buffer_content_changed)
 			   {
-				 glob.is_converted = false;
-				 glob.is_text_buffer_content_changed = false;
+				 //glob.is_converted = false;
+				 //glob.is_text_buffer_content_changed = false;
 				 
 				 if (!gtk_widget_is_focus (scrolled_window) )
 					gtk_widget_grab_focus (scrolled_window);
@@ -1005,6 +1016,10 @@ kbd_press_event ( GtkWidget *widget, GdkEventKey *event, gpointer data)
              //quit the game
              g_signal_emit_by_name (G_OBJECT (window), "destroy");
            }break;
+		   case GDK_KEY_F12:
+           {
+               g_signal_emit_by_name(G_OBJECT (flush_btn), "clicked");
+           } break;
            default:break;
         }
     /*else*/ return false;
@@ -1243,16 +1258,21 @@ static VipsImage* vips_load_file_type(const char* file_name)
 			//success = stbi_write_png(filename, w, h, channels, data, 0);
 			//try
 			{
+				vips_pdfload (file_name, &image, "page", 0,
+												 "n",   1,
+												 "dpi", 92.0);
 				//cout << file_name << endl;
     
 				//VImage in;// = VImage::new_from_file (argv[1]);
-				in = VImage::pdfload(file_name, VImage::option()
+				
+				/***in = VImage::pdfload(file_name, VImage::option()
 											->set("page", 0)
-											->set("n", 1));
+											->set("n", 1));*/ //uncomment
 											
 				//g_object_unref ( vips_glob.image );
 				//vips_glob.image = in.get_image();
-				image = in.get_image();
+				
+				//***image = in.get_image(); //uncomment
 				
 				/*if (vips_glob.image != nullptr)
 				{
@@ -1270,9 +1290,11 @@ static VipsImage* vips_load_file_type(const char* file_name)
         break;
         case PNG:
         { 
+			image = vipsdisp_load (file_name);
+			//vips_pngload (file_name, &image);
 			//success = stbi_write_png(filename, w, h, channels, data, 0);
-			in    = VImage::pngload(file_name);
-			image = in.get_image();
+			//in    = VImage::pngload(file_name);
+			//image = in.get_image();
 		}
         break;
         case JPG:
@@ -1720,12 +1742,13 @@ about_us( GtkWidget *widget,
 }
 
 
-int Print_Message(char* _str, gpointer data, int options = 0)
+int Print_Message(const char* _str, gpointer data, int options = 0)
 {
 	std::string foreground_color, background_color;
 	GtkTextBuffer *text_buffer = reinterpret_cast<GtkTextBuffer *>(data);
 	
-    gchar *entry_text;
+	size_t size = std::strlen (_str);
+    gchar *entry_text = nullptr;
     GtkTextIter iter, start, end;
     
     gtk_text_buffer_get_start_iter (text_buffer, &start);
@@ -1757,12 +1780,33 @@ int Print_Message(char* _str, gpointer data, int options = 0)
 			entry_text = g_convert( _str, -1, "UTF-8", "UTF-8", NULL, NULL, NULL);
 			entry_text = g_strdelimit (entry_text, "\b\f\n\r\t\v", ' ');
 		}break;
-		default: entry_text = g_convert( _str, -1, "UTF-8", "UTF-8", NULL, NULL, NULL); break;
+		default:
+		{
+			//cout << "3: " << size << endl;//"in print_msg convert default\n";
+			entry_text = g_convert( _str, size, "UTF-8", "UTF-8", NULL, NULL, NULL); 
+		}break;
 	}
     
-    gtk_text_buffer_insert (text_buffer, &iter, entry_text , -1);
+	if (entry_text != nullptr)
+		gtk_text_buffer_insert (text_buffer, &iter, entry_text , -1);
     //entry_text = g_convert( _str, -1, "UTF-8", "UTF-8", NULL, NULL, NULL);
 	
+}
+
+static void
+flush_ocr_text_cb (GtkButton *btn,
+			    gpointer   user_data)
+{
+	std::string dest( PathGetDir (pCmd[1]) );
+	//dest = PathGetDir (pCmd[1]);
+	dest += PathGetDirSeperator(pCmd[1]);
+	dest += "ocr_file.txt";
+				
+	if ( is_file_exist( dest ) )
+	{	
+		std::cout << "deleting:" << dest << std::endl;
+		g_remove (&dest[0]);
+	}
 }
 
 
@@ -1972,6 +2016,8 @@ std::string get_run_cmd ()
 	cmd  =  pCmd[0]; //ruby executable path
     cmd += " ";
     cmd += pCmd[1]; //card2isis.pl
+	cmd += " ";
+	cmd += tesseract_psm;
     //cmd += " temp.txt ";
     /*cmd += " ";
     cmd +=tmpFilePath;
@@ -2107,13 +2153,13 @@ static void export_img_roi_event( GtkWidget *widget, gpointer data )
 		  //cout << "2.start point: " << start_pos.first << " " << start_pos.second << endl;
 	      //cout << "2.wh: " << width << " " << height << endl;
 		  
-		  if ( array_roi_coords.size() != 0 )
-		  {			   
+		if ( array_roi_coords.size() != 0 )
+		{			   
 					
-			  fstream frio_list_name(pCmd[2], ios::out);
+			fstream frio_list_name(pCmd[2], ios::out);
 			  
-			  for (int i = 0; i <= array_roi_coords.size()-1; ++i)
-			  {
+			for (int i = 0; i <= array_roi_coords.size()-1; ++i)
+			{
 				//image.crop(array_roi_coords[i].x-10, array_roi_coords[i].y-10, 
 				//array_roi_coords[i].width, array_roi_coords[i].height );
 				str += std::to_string(i) + '.' + "png";//ext;
@@ -2122,12 +2168,12 @@ static void export_img_roi_event( GtkWidget *widget, gpointer data )
 				frio_list_name << str << endl;
 				save_pics_in_cache_dir (str, array_roi_coords[i]);
 				str = place_to_save_img_roi + file_name + "_";
-			   }
-			  frio_list_name.close();
+			}
+			frio_list_name.close();
 			  
-			  //list_roi.txt file to the place where ruby script located
-			  if ( is_file_exist( pCmd[2] ) )
-			  {
+			//list_roi.txt file to the place where ruby script located
+			if ( is_file_exist( pCmd[2] ) )
+			{
 				fname.assign(currDirPath);  
 				fname += PathGetDirSeperator(pCmd[1]);
 				
@@ -2137,45 +2183,46 @@ static void export_img_roi_event( GtkWidget *widget, gpointer data )
 				cout << "copying: " << dest << " " << fname << endl;
 				
 				copy_file_to_dest(fname, dest);
-			  }
-			  else
-			  {
-				  glob.err_msg = "There happened some mulfunctions: couldn't find list_roi.txt file.";
-				  cout << glob.err_msg << endl;
-				  Print_Message(&glob.err_msg[0], text_buffer, 1);
-				  goto leave_gracefully;
-			  }
-		  }
+			}
+			else
+			{
+			  glob.err_msg = "There happened some mulfunctions: couldn't find list_roi.txt file.";
+			  cout << glob.err_msg << endl;
+			  Print_Message(&glob.err_msg[0], text_buffer, 1);
+			  goto leave_gracefully;
+			}
 		  
-		  //run ocr_converter_utility.rb ruby script
-		  std::string cmd = get_run_cmd ();
-		  cout << "ruby script run: " << cmd << endl;
-		  //VImage::system(&cmd[0]);
-		  system(&cmd[0]);
+			//run ocr_converter_utility.rb ruby script
+			std::string cmd = get_run_cmd ();
+			cout << "ruby script run: " << cmd << endl;
+			//VImage::system(&cmd[0]);
+			system(&cmd[0]);
 		  
 		  
-		  fname = dest;
-		  fname += PathGetDirSeperator(pCmd[1]);
-		  fname += "ocr_file.txt";
+			fname = dest;
+			fname += PathGetDirSeperator(pCmd[1]);
+			fname += "ocr_file.txt";
 
-		  if ( g_file_test (&fname[0], G_FILE_TEST_EXISTS) )//is_file_exist(fname))
-		  {
+			if ( g_file_test (&fname[0], G_FILE_TEST_EXISTS) )//is_file_exist(fname))
+			{
 			  
-			  //str = "Image Converted!";
-			  glob.is_converted = true;
-			  buffer = file_io(&fname[0]);
-			  str.assign ( buffer );
-			  delete [] buffer;
-			  Print_Message(&str[0], text_buffer);
-		  }
-		  else
-		  {
-			  glob.is_converted = false;
-			  str = "Image Not Converted!";
-			  Print_Message(&str[0], text_buffer);
-			  //dest.assign (currDirPath);
-			  //copy_file_to_dest (fname, dest);
-		  }
+				//str = "Image Converted!";
+				glob.is_converted = true;
+				str = file_io(&fname[0]);
+				
+				//str.assign ( buffer );
+				//delete [] buffer;
+				Print_Message(&str[0], text_buffer);
+			}
+			else
+			{
+				glob.is_converted = false;
+				str = "Image Not Converted!";
+				Print_Message(&str[0], text_buffer);
+				//dest.assign (currDirPath);
+				//copy_file_to_dest (fname, dest);
+			}
+		}
       }
       else
       {
@@ -2197,8 +2244,17 @@ static void show_ocr_file_cb( GtkWidget *widget, gpointer data )
 	fname += PathGetDirSeperator(pCmd[1]);
 	fname += "ocr_file.txt";
 	
-	str.assign ( file_io(&fname[0]) );
-	Print_Message(&str[0], text_buffer);
+	if ( is_file_exist( fname ) )
+	{
+		//char *buffer = nullptr;
+		//str.resize(0);
+		str = file_io(&fname[0]);
+		//cout << "2: " << str.length() << endl;
+		//str.assign ( buffer );
+		Print_Message(&str[0], text_buffer);
+		//Print_Message(buffer, text_buffer);
+		//delete buffer;
+	}
 }
 
 
@@ -2226,6 +2282,8 @@ text_buffer_changed_event_cb (GtkTextBuffer *textbuffer,
 {
 	if (glob.focus_in_text)
 		glob.is_text_buffer_content_changed = true;
+	else
+		glob.is_text_buffer_content_changed = false;
 }
 
 static void app_activate(GtkApplication* app, gpointer user_data)
@@ -2419,6 +2477,16 @@ static void app_activate(GtkApplication* app, gpointer user_data)
 			G_CALLBACK (show_ocr_file_cb), text_buffer);
     gtk_box_pack_start (GTK_BOX (hbox), show_ocr_btn, FALSE, FALSE, 10);
    /*----------------------------------------------------------------------------*/
+   
+   
+   /*------------------------------flush ocr file-----------------------------*/
+	//button = gtk_button_new_from_stock(GTK_STOCK_PREFERENCES);
+	flush_btn = gtk_button_new_with_mnemonic ("_Flush OCR F12");
+    g_signal_connect (flush_btn, "clicked",
+			G_CALLBACK (flush_ocr_text_cb), GTK_WINDOW(window));
+    gtk_box_pack_start (GTK_BOX (hbox), flush_btn, FALSE, FALSE, 10);
+   /*------------------------------flush ocr file-----------------------------*/
+   
    
    /*---------------------------------settings dialog-------------------------*/
 	//button = gtk_button_new_from_stock(GTK_STOCK_PREFERENCES);

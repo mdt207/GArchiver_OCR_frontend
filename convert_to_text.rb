@@ -1,10 +1,5 @@
 #!/usr/bin/ruby
 
-# Bismillahir Rahmanir Raheem
-# All praises and gratitudes are due to Allah subhanahu wa Ta'ala
-# O Allah: (please do) bless Muhammad (s.a.w) and the Household of Muhammad (s.a.w)
-
-
 require 'pathname'
 require 'open3'
 require 'vips'
@@ -31,9 +26,8 @@ Dir.chdir(@WORK_DIR)
 SRC_DIR = File.dirname(@sequience_of_files[0].to_s)
 
 
-
 #Dir.chdir('../cache')
-Dir.chdir(@WORK_DIR.to_s + '/cache')
+Dir.chdir(@WORK_DIR.to_s + '\\cache')
 @TMP_DIR = Dir.getwd
 @TMP_DIR += '/tmp'
 Dir.mkdir @TMP_DIR unless Dir.exists? ('tmp')
@@ -80,7 +74,7 @@ class TextReader
     end #of if File.file?(@input_path)
     # read the text and return it
 
-    #p "tesseract #{@output_path} #{@file_name} -l #{@ocr_lang} --psm #{@tesseract_psm}"
+    #p "c:/opt/Tesseract-OCR/tesseract.exe #{@output_path} #{@file_name} -l #{@ocr_lang} --psm #{@tesseract_psm}"
 
     #text, _,  _ =
     text, err, s =
@@ -88,29 +82,33 @@ class TextReader
       #Open3.capture3("tesseract #{@output_path} stdout -l eng+uzb_cyrl --psm 3")
       #Open3.capture3("tesseract #{@output_path} #{@file_name} -l eng+uzb_cyrl --psm 13")
 
-      Open3.capture3("tesseract #{@output_path} #{@file_name} -l #{@ocr_lang} --psm #{@tesseract_psm}")
+      Open3.capture3("c:/opt/Tesseract-OCR/tesseract.exe #{@output_path} #{@file_name} -l #{@ocr_lang} --psm #{@tesseract_psm}")
+	  #Open3.capture3("c:/msys/mingw64/bin/gtk3-demo")
 
       #ocr_file_name = File.join(@out_fname.to_s, @file_name.to_s)
       ocr_file_name = @file_name.to_s + ".txt"
+      #p "ocr_file_name:" + ocr_file_name.to_s
+	  
       if File.exists?(ocr_file_name.to_s) #tesseract produced text file's full path and name
 
         ocr_files_list = File.new("list_ocr_files.txt", "w+") unless File.exists?("list_ocr_files.txt")
-		ocr_files_list = File.open("list_ocr_files.txt", "a") if File.exists?("list_ocr_files.txt")
+        ocr_files_list = File.open("list_ocr_files.txt", "a") if File.exists?("list_ocr_files.txt")
         ocr_files_list.puts(ocr_file_name)
-        p ocr_file_name
-        ocr_files_list.close
+        #p ocr_file_name
+        #ocr_files_list.close
 
-	ocr_file = File.new("ocr_file.txt", "w+") unless File.exists?("list_ocr_files.txt")
-	ocr_file = File.open("ocr_file.txt", "a") if File.exists?("list_ocr_files.txt")
-	all_sentence = ""
+        ocr_file = File.new("ocr_file.txt", "w+") unless File.exists?("list_ocr_files.txt")
+        ocr_file = File.open("ocr_file.txt", "a") if File.exists?("list_ocr_files.txt")
+        all_sentence = ""
+	
         File.open(ocr_file_name) do |f| #reading from tesseract produced text file
-             f.each do
-		|str|
-		str = str.gsub(/[\n\t]$/,' ')
-		str = str.sub(/[\f]$/,'')
-		#str = str.strip
-		all_sentence << str
-		end
+        f.each do
+          |str|
+          str = str.gsub(/[\n\t]$/,' ')
+          str = str.sub(/[\f]$/,'')
+          #str = str.strip
+          all_sentence << str
+        end
 	
 		all_sentence = all_sentence.sub(/\s$/,"") #remove trailing space
 		p "#{all_sentence}"
@@ -121,16 +119,18 @@ class TextReader
 		#ocr_file.write("#"+ @iter_num.to_s + " " + str)
 		#p str
       end
-	ocr_file.puts()
-	ocr_file.close
+	  ocr_file.puts()
+      ocr_file.close
 
-		if (s.success?)
-			p @iter_num.to_s
-			@iter_num += 1
-		end
-    end
+	  if (s.success?)
+	   p @iter_num.to_s
+	   @iter_num += 1
+	 end
+	 
+   end
+   #p text.strip
      #text.strip
-  end#Open3.capture3
+ end#Open3.capture3
 
 end
 
@@ -145,17 +145,16 @@ def check_file_name(file_name)
     fname = fname.gsub(/\n$/,'')
     tmp   = File.basename(fname)
     #p "sole name:#{tmp}"
-    #print file_name
-    #print " "
-    #print fname+"\n"
+    print file_name
+    print " "
+    print fname+"\n"
     @amount_of_files += 1
     #return true if (fname.to_s == file_name.to_s)
     #if (fname.to_s == file_name.to_s)
     if (tmp.to_s == file_name.to_s)
-	@amount_of_files = 0
-	return true
+	 @amount_of_files = 0
+	 return true
     end
-
   end
 end
 
@@ -169,8 +168,8 @@ p psm
 
 #Dir.mkdir TMP_DIR unless File.exists?(TMP_DIR)
 Dir.chdir(@WORK_DIR)
-ocr_files_list = File.new("list_ocr_files.txt", "w+") if File.exists?("list_ocr_files.txt")
-ocr_files_list.close
+ocr_files_list = File.new("list_ocr_files.txt", "w+") unless File.exists?("list_ocr_files.txt")
+#ocr_files_list.close
 
 
 new_name = TextReader.new(psm.to_s)
@@ -178,7 +177,8 @@ new_name = TextReader.new(psm.to_s)
 Pathname.new(SRC_DIR).children.each do
 #Dir.entries(SRC_DIR).select {
 |f|   if (File.file?(f) && check_file_name(f.basename))#f.basename.to_s == "test7.png")
-	#p f.basename
+	#p "#{@TMP_DIR}/#{f.basename}"
+	#p f.realpath
 	#new_name = TextReader.new(f.realpath,"#{TMP_DIR}/#{f.basename}").read
 	new_name.read(f.realpath,"#{@TMP_DIR}/#{f.basename}")
 

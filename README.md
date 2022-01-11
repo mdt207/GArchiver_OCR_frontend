@@ -12,8 +12,8 @@ Needed applications versions that are used for deployment:
 Make sure that the "MSYS2 development toolchain" check box is selected during the Ruby installation process. It's necessity for adding ruby-vips into the gem collection.
 In config.txt file enter absolute path to Tesseract-OCR and Ruby executables.
 
-e.g lines in config.txt:.
+e.g lines in config.txt (without line numbers):
  
-  C:\Ruby30-x64\bin\ruby.exe
-  C:\msys\home\mdt\prjs\ruby\subtitle_extractor\convert_to_text.rb
+  1. C:\Ruby30-x64\bin\ruby.exe
+  2. C:\msys\home\mdt\prjs\ruby\subtitle_extractor\convert_to_text.rb
 

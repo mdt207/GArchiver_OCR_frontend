@@ -9,5 +9,5 @@ Needed applications versions that are used for deployment:
  2. tesseract-ocr-w64-setup-v5.0.0.20211201.exe
  3. vips-dev-w64-all-8.12.1.zip
  
-Make sure that the MSYS2 development toolchain check box is selected during the Ruby installation process. It's necessity to add ruby-vips in gem collection.
+Make sure that the "MSYS2 development toolchain" check box is selected during the Ruby installation process. It's necessity to add ruby-vips in gem collection.
 In config.txt file enter absolute path to Tesseract-OCR and Ruby executables.

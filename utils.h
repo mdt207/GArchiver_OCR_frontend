@@ -10,6 +10,6 @@ enum ImageType
 };
 
 bool  is_file_exist(std::string& str);
-char* file_io(const char *file_name);
+std::string file_io(const char *file_name);
 
 ImageType getFileType(const char *filename);

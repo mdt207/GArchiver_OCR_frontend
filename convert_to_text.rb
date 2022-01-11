@@ -4,12 +4,6 @@ require 'pathname'
 require 'open3'
 require 'vips'
 
-#SRC_DIR = '/path/to/src/dir/'.freeze
-#TMP_DIR = '/path/to/tmp/dir/'.freeze
-
-#SRC_DIR = '../cache/'.freeze
-#TMP_DIR = '../cache/tmp/'.freeze
-
 
 @WORK_DIR = __dir__#+'../cache/tmp/'.freeze
 @TMP_DIR  = @WORK_DIR
@@ -76,14 +70,9 @@ class TextReader
 
     #p "c:/opt/Tesseract-OCR/tesseract.exe #{@output_path} #{@file_name} -l #{@ocr_lang} --psm #{@tesseract_psm}"
 
-    #text, _,  _ =
     text, err, s =
-      #Open3.capture3("tesseract #{@output_path} stdout -l eng+uzb_cyrl --oem 0 --psm 3")
-      #Open3.capture3("tesseract #{@output_path} stdout -l eng+uzb_cyrl --psm 3")
-      #Open3.capture3("tesseract #{@output_path} #{@file_name} -l eng+uzb_cyrl --psm 13")
-
+      
       Open3.capture3("c:/opt/Tesseract-OCR/tesseract.exe #{@output_path} #{@file_name} -l #{@ocr_lang} --psm #{@tesseract_psm}")
-	  #Open3.capture3("c:/msys/mingw64/bin/gtk3-demo")
 
       #ocr_file_name = File.join(@out_fname.to_s, @file_name.to_s)
       ocr_file_name = @file_name.to_s + ".txt"
@@ -171,7 +160,6 @@ Dir.chdir(@WORK_DIR)
 ocr_files_list = File.new("list_ocr_files.txt", "w+") unless File.exists?("list_ocr_files.txt")
 #ocr_files_list.close
 
-
 new_name = TextReader.new(psm.to_s)
 
 Pathname.new(SRC_DIR).children.each do
@@ -185,29 +173,4 @@ Pathname.new(SRC_DIR).children.each do
      else @amount_of_files = 0
     #@amount_of_files = 0 if(@amount_of_files == @sequience_of_files.length)
  end
-#|f|  new_name = TextReader.new(f.realpath,"#{TMP_DIR}/#{f.basename}").read if (File.file?(f) && check_file_name(f.basename))
-    #File.file? new_name = TextReader.new(f.realpath,
-     #  "#{TMP_DIR}/#{f.basename}")
-    #.read
-    #.downcase
-    #.gsub(/[[:punct:]]/, ' ')
-    #.split
-    #.join('-')
-  #File.file?(f) ? p f.basename : p "not file";
-  # the 252 byte limit is for the ext4 file system limit of 255 bytes per filename
-  # for some reason, the actual limit in Ruby's Pathname#rename is 252
-
-  #new_name = if !new_name.empty? && new_name.bytes.size < 252
-#               newly_renamed += 1
-#               new_name
-#             else
-#               not_renamed += 1
-#               f.basename
-#             end
-
-  #f.rename("#{SRC_DIR}/#{new_name}#{f.extname}")
 end
-#}
-
-puts "*" * 50
-puts "#{newly_renamed} files newly renamed vs. #{not_renamed} still have the same old name."
